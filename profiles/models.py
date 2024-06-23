@@ -17,7 +17,8 @@ class Profile(models.Model):
     email_address = models.EmailField(max_length=255, blank=True)
     phone = PhoneNumberField(blank=True)
     image = models.ImageField(
-        upload_to="memo-bubble/", default="../default_profile_nsltq7", blank=True
+        upload_to="memo-bubble/profile_images",
+        default="memo-bubble/profile_images/default_profile_qdfffx", blank=True
     )
 
     class Meta:
