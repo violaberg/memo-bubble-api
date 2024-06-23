@@ -46,12 +46,26 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "django.contrib.staticfiles",
+    "cloudinary_storage",
+    "cloudinary",
+    "rest_framework",
+    "phonenumber_field",
+    "django_filters",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
+    "django.contrib.sites",
+    "dj_rest_auth.registration",
+    "corsheaders",
+    "profiles",
 ]
 
 MIDDLEWARE = [
