@@ -71,6 +71,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     os.environ.get("ALLOWED_HOST"),
+    os.environ.get("ALLOWED_HOST_DOMAIN"),
 ]
 
 
@@ -125,7 +126,7 @@ if "CLIENT_ORIGIN_DEV" in os.environ:
 
 CORS_ALLOW_CREDENTIALS = True
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_ADDRESS")
@@ -167,6 +168,7 @@ if "DEV" in os.environ:
 else:
     DATABASES = {"default": dj_database_url.parse(
         os.environ.get("DATABASE_URL"))}
+    print("SQL")
 
 
 # Password validation
