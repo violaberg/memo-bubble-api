@@ -50,8 +50,12 @@ JWT_AUTH_COOKIE = "my-app-auth"
 JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"
 JWT_AUTH_SAMESITE = "None"
 
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = True
+
 REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "memo_bubble.serializers.CurrentUserSerializer"
+    "USER_DETAILS_SERIALIZER": "memo_bubble.serializers.CurrentUserSerializer",
+    "REGISTER_SERIALIZER": "memo_bubble.serializers.CustomRegisterSerializer",
 }
 
 # Quick-start development settings - unsuitable for production
