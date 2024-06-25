@@ -24,6 +24,13 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class VideoSerializer(serializers.ModelSerializer):
+    def validate_videos(self, value):
+        for video in value:
+            if video.size > 1024 * 1024 * 10:
+                raise serializers.ValidationError(
+                    "Video size can't exceed 10MB")
+        return value
+
     class Meta:
         model = Video
         fields = '__all__'
@@ -44,9 +51,11 @@ class CapsuleSerializer(serializers.ModelSerializer):
     videos = VideoSerializer(many=True, read_only=True)
     gemini_messages = GeminiMessageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(), write_only=True)
+        child=serializers.ImageField(), write_only=True,
+        validators=[ImageSerializer().validate_images], required=False)
     uploaded_videos = serializers.ListField(
-        child=serializers.FileField(), write_only=True)
+        child=serializers.FileField(), write_only=True,
+        validators=[VideoSerializer().validate_videos], required=False)
     uploaded_gemini_messages = serializers.ListField(
         child=serializers.CharField(), write_only=True)
 
