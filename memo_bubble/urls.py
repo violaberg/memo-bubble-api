@@ -30,4 +30,5 @@ urlpatterns = [
     )),
     path("", include("profiles.urls")),
     path("", include("contact.urls")),
+    path("", include("capsules.urls")),
 ]
