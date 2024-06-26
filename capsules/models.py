@@ -17,30 +17,28 @@ class Capsule(models.Model):
         return f"{self.owner}'s Capsule: {self.title}"
 
 
-class Image(models.Model):
+class Images(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='memo-bubble/images/')
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
+    date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-created_on']
+        ordering = ['-date_taken']
         verbose_name_plural = "Images"
 
     def __str__(self):
         return f"{self.capsule.title} Image"
 
 
-class Video(models.Model):
+class Videos(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='videos', on_delete=models.CASCADE)
     video = models.FileField(upload_to='memo-bubble/videos/')
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
+    date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-created_on']
+        ordering = ['-date_taken']
         verbose_name_plural = "Videos"
 
     def __str__(self):
@@ -48,8 +46,10 @@ class Video(models.Model):
 
 
 class GeminiMessage(models.Model):
-    capsule = models.ForeignKey(
-        Capsule, related_name='gemini_messages', on_delete=models.CASCADE)
+    image = models.ForeignKey(Images, related_name='gemini_messages',
+                              on_delete=models.CASCADE, null=True, blank=True)
+    video = models.ForeignKey(Videos, related_name='gemini_messages',
+                              on_delete=models.CASCADE, null=True, blank=True)
     message = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -59,4 +59,4 @@ class GeminiMessage(models.Model):
         verbose_name_plural = "Gemini Messages"
 
     def __str__(self):
-        return f"{self.capsule.title} Gemini Fact Message"
+        return f"{self.video or self.image}: {self.message[:50]}..."
