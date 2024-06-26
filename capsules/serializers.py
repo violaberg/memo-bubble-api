@@ -118,6 +118,50 @@ class CapsuleSerializer(serializers.ModelSerializer):
 
         return capsule
 
+    def update(self, instance, validated_data):
+        uploaded_images = validated_data.pop("uploaded_images", [])
+        uploaded_images_metadata = json.loads(
+            validated_data.pop("uploaded_images_metadata", "[]"))
+        uploaded_videos = validated_data.pop("uploaded_videos", [])
+        uploaded_videos_metadata = json.loads(
+            validated_data.pop("uploaded_videos_metadata", "[]"))
+
+        instance.title = validated_data.get("title", instance.title)
+        instance.message = validated_data.get("message", instance.message)
+        instance.release_date = validated_data.get(
+            "release_date", instance.release_date)
+        instance.save()
+
+        images = []
+        for image_file, image_data in zip(
+                uploaded_images, uploaded_images_metadata
+        ):
+            date_taken = image_data.get("date_taken")
+            gemini_messages_data = image_data.get("gemini_messages", [])
+            image = Images.objects.create(
+                capsule=instance, image=image_file, date_taken=date_taken
+            )
+            for gemini_message_data in gemini_messages_data:
+                GeminiMessage.objects.create(
+                    image=image, **gemini_message_data)
+            images.append(image)
+
+        videos = []
+        for video_file, video_data in zip(
+                uploaded_videos, uploaded_videos_metadata
+        ):
+            date_taken = video_data.get("date_taken")
+            gemini_messages_data = video_data.get("gemini_messages", [])
+            video = Videos.objects.create(
+                capsule=instance, video=video_file, date_taken=date_taken
+            )
+            for gemini_message_data in gemini_messages_data:
+                GeminiMessage.objects.create(
+                    video=video, **gemini_message_data)
+            videos.append(video)
+
+        return instance
+
     class Meta:
         model = Capsule
         fields = "__all__"

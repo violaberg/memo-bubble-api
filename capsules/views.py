@@ -15,3 +15,11 @@ class CapsuleList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+        
+
+class CapsuleDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Capsule.objects.all()
+    serializer_class = CapsuleSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+    
+    
