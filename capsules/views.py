@@ -52,3 +52,14 @@ class GeminiMessageList(generics.ListCreateAPIView):
 
     serializer_class = GeminiMessageSerializer
     permission_classes = [IsAdminUserOrReadOnly]
+
+
+class ImageDelete(generics.RetrieveDestroyAPIView):
+    queryset = Images.objects.all()
+    serializer_class = ImageSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+
+    def get_object(self):
+        # Retrieve the specific image by its ID
+        image_id = self.kwargs["image_id"]
+        return generics.get_object_or_404(Images, id=image_id)
