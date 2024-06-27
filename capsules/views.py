@@ -63,3 +63,14 @@ class ImageDelete(generics.RetrieveDestroyAPIView):
         # Retrieve the specific image by its ID
         image_id = self.kwargs["image_id"]
         return generics.get_object_or_404(Images, id=image_id)
+
+
+class VideoDelete(generics.RetrieveDestroyAPIView):
+    queryset = Videos.objects.all()
+    serializer_class = VideoSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+
+    def get_object(self):
+        # Retrieve the specific video by its ID
+        video_id = self.kwargs["video_id"]
+        return generics.get_object_or_404(Videos, id=video_id)
