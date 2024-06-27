@@ -28,7 +28,10 @@ class Images(models.Model):
         verbose_name_plural = "Images"
 
     def __str__(self):
-        return f"{self.capsule.title} Image"
+        owner = self.capsule.owner
+        capsule = self.capsule.title
+        date = self.date_taken.strftime("%d-%m-%Y")
+        return f"{owner}'s capsule {capsule} Image {self.id}, {date}"
 
 
 class Videos(models.Model):
@@ -42,7 +45,10 @@ class Videos(models.Model):
         verbose_name_plural = "Videos"
 
     def __str__(self):
-        return f"{self.capsule.title} Video"
+        owner = self.capsule.owner
+        capsule = self.capsule.title
+        date = self.date_taken.strftime("%d-%m-%Y")
+        return f"{owner}'s capsule {capsule} Video {self.id}, {date}"
 
 
 class GeminiMessage(models.Model):
