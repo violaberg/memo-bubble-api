@@ -74,3 +74,14 @@ class VideoDelete(generics.RetrieveDestroyAPIView):
         # Retrieve the specific video by its ID
         video_id = self.kwargs["video_id"]
         return generics.get_object_or_404(Videos, id=video_id)
+
+
+class GeminiMessageDelete(generics.RetrieveDestroyAPIView):
+    queryset = GeminiMessage.objects.all()
+    serializer_class = GeminiMessageSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+
+    def get_object(self):
+        # Retrieve the specific gemini message by its ID
+        gemini_message_id = self.kwargs["gemini_message_id"]
+        return generics.get_object_or_404(GeminiMessage, id=gemini_message_id)

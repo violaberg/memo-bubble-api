@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CapsuleList, CapsuleDetail, ImageList, VideoList, GeminiMessageList, ImageDelete, VideoDelete
+from .views import CapsuleList, CapsuleDetail, ImageList, VideoList, GeminiMessageList, ImageDelete, VideoDelete, GeminiMessageDelete
 
 urlpatterns = [
     path('capsules/', CapsuleList.as_view(), name='capsule-list'),
@@ -14,4 +14,7 @@ urlpatterns = [
          ImageDelete.as_view(), name='image-delete'),
     path('capsules/<int:pk>/videos/<int:video_id>/',
          VideoDelete.as_view(), name='video-delete'),
+    path('capsules/<int:pk>/images/<int:image_id>'
+         '/gemini-messages/<int:gemini_message_id>/',
+         GeminiMessageDelete.as_view(), name='gemini-message-delete'),
 ]
