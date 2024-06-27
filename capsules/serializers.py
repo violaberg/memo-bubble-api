@@ -2,6 +2,7 @@ import json
 from rest_framework import serializers
 from .models import Capsule, Images, Videos, GeminiMessage
 from django.core.files.images import get_image_dimensions
+from likes.models import Like
 
 
 class GeminiMessageSerializer(serializers.ModelSerializer):
@@ -63,6 +64,8 @@ class CapsuleSerializer(serializers.ModelSerializer):
     profile_id = serializers.ReadOnlyField(source="agent_name.profile.id")
     images = ImageSerializer(many=True, required=False)
     videos = VideoSerializer(many=True, required=False)
+    like_id = serializers.SerializerMethodField()
+    likes_count = serializers.ReadOnlyField()
 
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(), write_only=True, required=False
@@ -77,6 +80,13 @@ class CapsuleSerializer(serializers.ModelSerializer):
 
     def get_is_owner(self, obj):
         return self.context["request"].user == obj.owner
+
+    def get_like_id(self, obj):
+        user = self.context["request"].user
+        if user.is_authenticated:
+            like = Like.objects.filter(owner=user, capsule=obj).first()
+            return like.id if like else None
+        return None
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop("uploaded_images", [])
@@ -164,4 +174,22 @@ class CapsuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Capsule
-        fields = "__all__"
+        fields = [
+            "id",
+            "owner",
+            "title",
+            "message",
+            "release_date",
+            "created_on",
+            "updated_on",
+            "is_owner",
+            "profile_id",
+            "images",
+            "videos",
+            "uploaded_images",
+            "uploaded_images_metadata",
+            "uploaded_videos",
+            "uploaded_videos_metadata",
+            "like_id",
+            "likes_count",
+        ]

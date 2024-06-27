@@ -8,10 +8,18 @@ from memo_bubble.permissions import IsAdminUserOrReadOnly
 
 class CapsuleList(generics.ListCreateAPIView):
     queryset = Capsule.objects.annotate(
+        likes_count=Count('likes', distinct=True),
         capsule_count=Count("owner__capsule")).order_by("-capsule_count")
     serializer_class = CapsuleSerializer
     permission_classes = [IsAdminUserOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend,
+                       filters.SearchFilter, filters.OrderingFilter]
+
+    filterset_fields = [
+        # 'owner__followed__owner__profile',
+        'likes__owner__profile',
+        'owner__profile',
+    ]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
