@@ -1,5 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from allauth.account.views import ConfirmEmailView
+from rest_framework.views import APIView
+from django.shortcuts import redirect
 
 from .settings import (
     JWT_AUTH_COOKIE,
@@ -64,3 +67,10 @@ def logout_route(request):
     )
 
     return response
+
+
+class CustomConfirmEmailView(APIView, ConfirmEmailView):
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.confirm(self.request)
+        return redirect("http://localhost:3000/email-confirmed/")
