@@ -53,6 +53,8 @@ JWT_AUTH_SAMESITE = "None"
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', ]
+
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "memo_bubble.serializers.CurrentUserSerializer",
     "REGISTER_SERIALIZER": "memo_bubble.serializers.CustomRegisterSerializer",
@@ -72,6 +74,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     os.environ.get("ALLOWED_HOST"),
     os.environ.get("ALLOWED_HOST_DOMAIN"),
+    os.environ.get("ALLOWED_HOST_DOMAIN_DEV"),
+    os.environ.get("ALLOWED_HOST_GP"),
 ]
 
 
@@ -125,6 +129,12 @@ if "CLIENT_ORIGIN_DEV" in os.environ:
     )
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^http:\/\/localhost:*([0-9]+)?$",
+    ]
+    
+if 'CLIENT_ORIGIN_DEV_GP' in os.environ:
+    extracted_url = re.match(r'^.+-', os.environ.get('CLIENT_ORIGIN_DEV', ''), re.IGNORECASE).group(0)
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
     ]
 
 CORS_ALLOW_CREDENTIALS = True
