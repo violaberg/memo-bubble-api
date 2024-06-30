@@ -70,6 +70,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "https://3000-violaberg-memobubble-07qcorpb264.ws.codeinstitute-ide.net/",
     os.environ.get("ALLOWED_HOST"),
     os.environ.get("ALLOWED_HOST_DOMAIN"),
 ]
