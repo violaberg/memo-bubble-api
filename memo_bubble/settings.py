@@ -132,12 +132,18 @@ if "CLIENT_ORIGIN_DEV" in os.environ:
     )
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^http:\/\/localhost:*([0-9]+)?$",
+    ]
+if "CLIENT_ORIGIN_DEV_GP" in os.environ:
+    extracted_url = re.match(
+        r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV", ""), re.IGNORECASE
+    )
+    CORS_ALLOWED_ORIGIN_REGEXES = [
         rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
     ]
 
 
-
 CORS_ALLOW_CREDENTIALS = True
+
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
