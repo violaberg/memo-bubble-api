@@ -73,6 +73,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "https://3000-violaberg-memobubble-07qcorpb264.ws.codeinstitute-ide.net/",
+    "https://3000-violaberg-memobubble-wt8snomdksy.ws-eu114.gitpod.io",
     os.environ.get("ALLOWED_HOST"),
     os.environ.get("ALLOWED_HOST_DOMAIN"),
     os.environ.get("ALLOWED_HOST_DOMAIN_DEV"),
