@@ -126,23 +126,14 @@ MIDDLEWARE = [
 
 if "CLIENT_ORIGIN" in os.environ:
     CORS_ALLOWED_ORIGINS = [os.environ.get("CLIENT_ORIGIN")]
-if "CLIENT_ORIGIN_DEV" in os.environ:
-    extracted_url = re.match(
-        r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV", ""), re.IGNORECASE
-    )
-    if extracted_url:
-        CORS_ALLOWED_ORIGIN_REGEXES = [
-            rf"{extracted_url.group(1)}",
-        ]
-
 if "CLIENT_ORIGIN_DEV_GP" in os.environ:
     extracted_url = re.match(
         r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV_GP", ""), re.IGNORECASE
     )
-    if extracted_url:
-        CORS_ALLOWED_ORIGIN_REGEXES = [
-            rf"{extracted_url.group(1)}",
-        ]
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
+        r"^http:\/\/localhost:*([0-9]+)?$",
+    ]
 
 
 CORS_ALLOW_CREDENTIALS = True
