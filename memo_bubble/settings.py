@@ -125,7 +125,8 @@ MIDDLEWARE = [
 ]
 
 if "CLIENT_ORIGIN" in os.environ:
-    CORS_ALLOWED_ORIGINS = [os.environ.get("CLIENT_ORIGIN")]
+    CORS_ALLOWED_ORIGINS = [os.environ.get(
+        "CLIENT_ORIGIN"), os.environ.get("CLIENT_ORIGIN_CUSTOM_DOMAIN")]
 if "CLIENT_ORIGIN_DEV_GP" in os.environ:
     extracted_url = re.match(
         r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV_GP", ""), re.IGNORECASE
