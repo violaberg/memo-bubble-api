@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import root_route, logout_route, get_user_status, CustomConfirmEmailView
+from .views import root_route, logout_route, get_user_status, CustomConfirmEmailView, resend_email_confirmation
 
 urlpatterns = [
     path("", root_route),
@@ -28,8 +28,9 @@ urlpatterns = [
     path("dj-rest-auth/registration/", include(
         "dj_rest_auth.registration.urls"
     )),
-    path('dj-rest-auth/registration/account-confirm-emaile/<str:key>/',
+    path('dj-rest-auth/registration/account-confirm-email/<str:key>/',
          CustomConfirmEmailView.as_view(), name='account_confirm_email'),
+    path('dj-rest-auth/registration/resend-email/', resend_email_confirmation),
     path("", include("profiles.urls")),
     path("", include("contact.urls")),
     path("", include("capsules.urls")),
