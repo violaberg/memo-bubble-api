@@ -105,7 +105,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
             date_taken = image_data.get("date_taken")
             gemini_messages_data = image_data.get("gemini_messages", [])
             image = Images.objects.create(
-                capsule=capsule, image=image_file, date_taken=date_taken
+                capsule=capsule, url=image_file, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
@@ -119,7 +119,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
             date_taken = video_data.get("date_taken")
             gemini_messages_data = video_data.get("gemini_messages", [])
             video = Videos.objects.create(
-                capsule=capsule, video=video_file, date_taken=date_taken
+                capsule=capsule, url=video_file, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
