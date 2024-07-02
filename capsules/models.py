@@ -20,7 +20,7 @@ class Capsule(models.Model):
 class Images(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='memo-bubble/images/')
+    url = models.ImageField(upload_to='memo-bubble/images/')
     date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -37,7 +37,7 @@ class Images(models.Model):
 class Videos(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='videos', on_delete=models.CASCADE)
-    video = models.FileField(upload_to='memo-bubble/videos/')
+    url = models.FileField(upload_to='memo-bubble/videos/')
     date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:
