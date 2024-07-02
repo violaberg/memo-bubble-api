@@ -28,7 +28,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Images
-        fields = ["id", "image", "date_taken", "gemini_messages"]
+        fields = ["id", "url", "date_taken", "gemini_messages"]
 
     def create(self, validated_data):
         gemini_messages_data = validated_data.pop('gemini_messages', [])
@@ -48,7 +48,7 @@ class VideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Videos
-        fields = ["id", "video", "date_taken", "gemini_messages"]
+        fields = ["id", "url", "date_taken", "gemini_messages"]
 
     def create(self, validated_data):
         gemini_messages_data = validated_data.pop('gemini_messages', [])
@@ -149,7 +149,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
             date_taken = image_data.get("date_taken")
             gemini_messages_data = image_data.get("gemini_messages", [])
             image = Images.objects.create(
-                capsule=instance, image=image_file, date_taken=date_taken
+                capsule=instance, url=image_file, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
@@ -163,7 +163,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
             date_taken = video_data.get("date_taken")
             gemini_messages_data = video_data.get("gemini_messages", [])
             video = Videos.objects.create(
-                capsule=instance, video=video_file, date_taken=date_taken
+                capsule=instance, url=video_file, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
