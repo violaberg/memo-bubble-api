@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.views import EmailVerificationSentView
 from allauth.account.utils import send_email_confirmation
-from django.conf import settings
 from django.contrib.auth import get_user_model
+import os
 
 
 from .settings import (
@@ -83,7 +83,7 @@ class CustomConfirmEmailView(APIView, ConfirmEmailView):
     def get(self, *args, **kwargs):
         self.object = self.get_object()
         self.object.confirm(self.request)
-        return redirect("http://localhost:3000/email-confirmed/")
+        return redirect(os.environ.get("FRONTEND_URL"))
 
 
 class VerifyEmailView(VerifyEmailView):
