@@ -28,7 +28,7 @@ urlpatterns = [
     path("dj-rest-auth/registration/", include(
         "dj_rest_auth.registration.urls"
     )),
-    path('dj-rest-auth/registration/account-confirm-email/<str:key>/',
+    path('dj-rest-auth/registration/account-confirm-emails/<str:key>/',
          CustomConfirmEmailView.as_view(), name='account_confirm_email'),
     path('dj-rest-auth/registration/resend-email/', resend_email_confirmation),
     path("", include("profiles.urls")),

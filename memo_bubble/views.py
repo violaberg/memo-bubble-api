@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.views import EmailVerificationSentView
 from allauth.account.utils import send_email_confirmation
+from django.conf import settings
 from django.contrib.auth import get_user_model
 import os
 

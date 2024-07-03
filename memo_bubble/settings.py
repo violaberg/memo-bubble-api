@@ -127,9 +127,9 @@ MIDDLEWARE = [
 if "CLIENT_ORIGIN" in os.environ:
     CORS_ALLOWED_ORIGINS = [os.environ.get(
         "CLIENT_ORIGIN"), os.environ.get("CLIENT_ORIGIN_CUSTOM_DOMAIN")]
-if "CLIENT_ORIGIN_DEV_GP" in os.environ:
+if "CLIENT_ORIGIN_DEV" in os.environ:
     extracted_url = re.match(
-        r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV_GP", ""), re.IGNORECASE
+        r"^.+-", os.environ.get("CLIENT_ORIGIN_DEV", ""), re.IGNORECASE
     )
     CORS_ALLOWED_ORIGIN_REGEXES = [
         rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
@@ -141,7 +141,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.eu.mailgun.org'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_ADDRESS")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
