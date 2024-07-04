@@ -61,7 +61,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class CapsuleSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.username")
     is_owner = serializers.SerializerMethodField()
-    profile_id = serializers.ReadOnlyField(source="agent_name.profile.id")
+    profile_id = serializers.ReadOnlyField(source="owner.profile.id")
     images = ImageSerializer(many=True, required=False)
     videos = VideoSerializer(many=True, required=False)
     like_id = serializers.SerializerMethodField()
