@@ -1,9 +1,23 @@
-from rest_framework import generics, filters
+from rest_framework import generics, filters, permissions
+from django_filters import rest_framework as filter
 from .models import Capsule, Images, Videos, GeminiMessage
 from .serializers import CapsuleSerializer, ImageSerializer, VideoSerializer, GeminiMessageSerializer
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
-from memo_bubble.permissions import IsAdminUserOrReadOnly
+from memo_bubble.permissions import IsAdminUserOrReadOnly, IsAdminUserOrReadOnly
+
+
+class CapsuleFilter(filter.FilterSet):
+
+    min_date = filter.DateFilter(field_name='release_date', lookup_expr='gte')
+    max_date = filter.DateFilter(field_name='release_date', lookup_expr='lte')
+
+    class Meta:
+        model = Capsule
+        fields = {
+            'owner': ['exact'],
+            'release_date': ['exact'],
+        }
 
 
 class CapsuleList(generics.ListCreateAPIView):
@@ -11,14 +25,16 @@ class CapsuleList(generics.ListCreateAPIView):
         likes_count=Count('likes', distinct=True),
         capsule_count=Count("owner__capsule")).order_by("-capsule_count")
     serializer_class = CapsuleSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = CapsuleFilter
 
     filterset_fields = [
         # 'owner__followed__owner__profile',
-        'likes__owner__profile',
-        'owner__profile',
+        'likes__owner',
+        'owner',
+        'release_date',
     ]
 
     def perform_create(self, serializer):
@@ -28,7 +44,7 @@ class CapsuleList(generics.ListCreateAPIView):
 class CapsuleDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Capsule.objects.all()
     serializer_class = CapsuleSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class ImageList(generics.ListCreateAPIView):
@@ -36,7 +52,7 @@ class ImageList(generics.ListCreateAPIView):
         return Images.objects.filter(capsule=self.kwargs["pk"])
 
     serializer_class = ImageSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class VideoList(generics.ListCreateAPIView):
@@ -44,7 +60,7 @@ class VideoList(generics.ListCreateAPIView):
         return Videos.objects.filter(capsule=self.kwargs["pk"])
 
     serializer_class = VideoSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class GeminiMessageList(generics.ListCreateAPIView):
@@ -59,13 +75,13 @@ class GeminiMessageList(generics.ListCreateAPIView):
             return GeminiMessage.objects.filter(video=self.kwargs["video_id"])
 
     serializer_class = GeminiMessageSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class ImageDelete(generics.RetrieveDestroyAPIView):
     queryset = Images.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific image by its ID
@@ -76,7 +92,7 @@ class ImageDelete(generics.RetrieveDestroyAPIView):
 class VideoDelete(generics.RetrieveDestroyAPIView):
     queryset = Videos.objects.all()
     serializer_class = VideoSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific video by its ID
@@ -87,7 +103,7 @@ class VideoDelete(generics.RetrieveDestroyAPIView):
 class GeminiMessageDelete(generics.RetrieveDestroyAPIView):
     queryset = GeminiMessage.objects.all()
     serializer_class = GeminiMessageSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific gemini message by its ID
