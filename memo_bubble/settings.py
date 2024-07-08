@@ -30,7 +30,7 @@ REST_FRAMEWORK = {
         )
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 15,
+    "PAGE_SIZE": 50,
     "DATETIME_FORMAT": "%d %b %Y",
 }
 
@@ -48,8 +48,6 @@ JWT_AUTH_SAMESITE = "None"
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://3000-violaberg-memobubble-wt8snomdksy.ws-eu114.gitpod.io',
-                        'https://3000-violaberg-memobubble-07qcorpb264.ws.codeinstitute-ide.net']
 
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "memo_bubble.serializers.CurrentUserSerializer",
@@ -220,11 +218,11 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-CLOUDINARY_STORAGE = {"CLOUDINARY_URL": os.environ.get("CLOUDINARY_URL")}
+# CLOUDINARY_STORAGE = {"CLOUDINARY_URL": os.environ.get("CLOUDINARY_URL")}
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+# DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 if 'USE_AWS' in os.environ:
     # Cache control
