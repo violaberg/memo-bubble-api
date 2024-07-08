@@ -30,7 +30,7 @@ REST_FRAMEWORK = {
         )
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 15,
+    "PAGE_SIZE": 50,
     "DATETIME_FORMAT": "%d %b %Y",
 }
 
@@ -48,8 +48,6 @@ JWT_AUTH_SAMESITE = "None"
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'https://3000-violaberg-memobubble-wt8snomdksy.ws-eu114.gitpod.io',
-                        'https://3000-violaberg-memobubble-07qcorpb264.ws.codeinstitute-ide.net']
 
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": "memo_bubble.serializers.CurrentUserSerializer",
