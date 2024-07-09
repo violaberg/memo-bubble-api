@@ -5,6 +5,21 @@ from django.core.files.images import get_image_dimensions
 from likes.models import Like
 
 
+def validate_images(value):
+    for image in value:
+        if image.size > 1024 * 1024 * 2:
+            raise serializers.ValidationError(
+                "Image size can't exceed 2MB")
+        width, height = get_image_dimensions(image)
+        if width > 4096:
+            raise serializers.ValidationError(
+                "Image width can't exceed 4096px")
+        if height > 4096:
+            raise serializers.ValidationError(
+                "Image height can't exceed 4096px")
+    return value
+
+
 class GeminiMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeminiMessage
@@ -13,18 +28,6 @@ class GeminiMessageSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
     gemini_messages = GeminiMessageSerializer(many=True, required=False)
-
-    def validate_image(self, value):
-        if value.size > 1024 * 1024 * 2:
-            raise serializers.ValidationError("Image size can't exceed 2MB")
-        width, height = get_image_dimensions(value)
-        if width > 4096:
-            raise serializers.ValidationError(
-                "Image width can't exceed 4096px")
-        if height > 4096:
-            raise serializers.ValidationError(
-                "Image height can't exceed 4096px")
-        return value
 
     class Meta:
         model = Images
@@ -40,11 +43,6 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class VideoSerializer(serializers.ModelSerializer):
     gemini_messages = GeminiMessageSerializer(many=True, required=False)
-
-    def validate_video(self, value):
-        if value.size > 1024 * 1024 * 10:
-            raise serializers.ValidationError("Video size can't exceed 10MB")
-        return value
 
     class Meta:
         model = Videos
@@ -68,13 +66,14 @@ class CapsuleSerializer(serializers.ModelSerializer):
     likes_count = serializers.ReadOnlyField()
 
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(), write_only=True, required=False
+        child=serializers.ImageField(), write_only=True,
+        required=False, validators=[validate_images]
     )
     uploaded_images_metadata = serializers.CharField(
         write_only=True, required=False)
-    uploaded_videos = serializers.ListField(
-        child=serializers.FileField(), write_only=True, required=False
-    )
+    # uploaded_videos = serializers.ListField(
+    #     child=serializers.FileField(), write_only=True, required=False
+    # )
     uploaded_videos_metadata = serializers.CharField(
         write_only=True, required=False)
 
@@ -92,7 +91,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
         uploaded_images = validated_data.pop("uploaded_images", [])
         uploaded_images_metadata = json.loads(
             validated_data.pop("uploaded_images_metadata", "[]"))
-        uploaded_videos = validated_data.pop("uploaded_videos", [])
+        # uploaded_videos = validated_data.pop("uploaded_videos", [])
         uploaded_videos_metadata = json.loads(
             validated_data.pop("uploaded_videos_metadata", "[]"))
 
@@ -113,18 +112,29 @@ class CapsuleSerializer(serializers.ModelSerializer):
             images.append(image)
 
         videos = []
-        for video_file, video_data in zip(
-                uploaded_videos, uploaded_videos_metadata
-        ):
+        for video_data in uploaded_videos_metadata:
+            url = video_data.get("url")
             date_taken = video_data.get("date_taken")
             gemini_messages_data = video_data.get("gemini_messages", [])
             video = Videos.objects.create(
-                capsule=capsule, url=video_file, date_taken=date_taken
+                capsule=capsule, url=url, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
                     video=video, **gemini_message_data)
             videos.append(video)
+        # for video_file, video_data in zip(
+        #         uploaded_videos, uploaded_videos_metadata
+        # ):
+        #     date_taken = video_data.get("date_taken")
+        #     gemini_messages_data = video_data.get("gemini_messages", [])
+        #     video = Videos.objects.create(
+        #         capsule=capsule, url=video_file, date_taken=date_taken
+        #     )
+        #     for gemini_message_data in gemini_messages_data:
+        #         GeminiMessage.objects.create(
+        #             video=video, **gemini_message_data)
+        #     videos.append(video)
 
         return capsule
 
@@ -132,7 +142,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
         uploaded_images = validated_data.pop("uploaded_images", [])
         uploaded_images_metadata = json.loads(
             validated_data.pop("uploaded_images_metadata", "[]"))
-        uploaded_videos = validated_data.pop("uploaded_videos", [])
+        # uploaded_videos = validated_data.pop("uploaded_videos", [])
         uploaded_videos_metadata = json.loads(
             validated_data.pop("uploaded_videos_metadata", "[]"))
 
@@ -157,18 +167,29 @@ class CapsuleSerializer(serializers.ModelSerializer):
             images.append(image)
 
         videos = []
-        for video_file, video_data in zip(
-                uploaded_videos, uploaded_videos_metadata
-        ):
+        for video_data in uploaded_videos_metadata:
+            url = video_data.get("url")
             date_taken = video_data.get("date_taken")
             gemini_messages_data = video_data.get("gemini_messages", [])
             video = Videos.objects.create(
-                capsule=instance, url=video_file, date_taken=date_taken
+                capsule=instance, url=url, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
                     video=video, **gemini_message_data)
             videos.append(video)
+        # for video_file, video_data in zip(
+        #         uploaded_videos, uploaded_videos_metadata
+        # ):
+        #     date_taken = video_data.get("date_taken")
+        #     gemini_messages_data = video_data.get("gemini_messages", [])
+        #     video = Videos.objects.create(
+        #         capsule=instance, url=video_file, date_taken=date_taken
+        #     )
+        #     for gemini_message_data in gemini_messages_data:
+        #         GeminiMessage.objects.create(
+        #             video=video, **gemini_message_data)
+        #     videos.append(video)
 
         return instance
 

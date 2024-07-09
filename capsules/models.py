@@ -37,7 +37,7 @@ class Images(models.Model):
 class Videos(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='videos', on_delete=models.CASCADE)
-    url = models.FileField(upload_to='memo-bubble/videos/')
+    url = models.URLField()
     date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:

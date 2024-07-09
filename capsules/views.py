@@ -1,10 +1,16 @@
-from rest_framework import generics, filters, permissions
+from rest_framework import generics, filters, permissions, status
 from django_filters import rest_framework as filter
 from .models import Capsule, Images, Videos, GeminiMessage
 from .serializers import CapsuleSerializer, ImageSerializer, VideoSerializer, GeminiMessageSerializer
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
-from memo_bubble.permissions import IsAdminUserOrReadOnly, IsAdminUserOrReadOnly
+from memo_bubble.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.conf import settings
+import boto3
+import json
 
 
 class CapsuleFilter(filter.FilterSet):
@@ -81,7 +87,7 @@ class GeminiMessageList(generics.ListCreateAPIView):
 class ImageDelete(generics.RetrieveDestroyAPIView):
     queryset = Images.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific image by its ID
@@ -92,7 +98,7 @@ class ImageDelete(generics.RetrieveDestroyAPIView):
 class VideoDelete(generics.RetrieveDestroyAPIView):
     queryset = Videos.objects.all()
     serializer_class = VideoSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific video by its ID
@@ -103,9 +109,41 @@ class VideoDelete(generics.RetrieveDestroyAPIView):
 class GeminiMessageDelete(generics.RetrieveDestroyAPIView):
     queryset = GeminiMessage.objects.all()
     serializer_class = GeminiMessageSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_object(self):
         # Retrieve the specific gemini message by its ID
         gemini_message_id = self.kwargs["gemini_message_id"]
         return generics.get_object_or_404(GeminiMessage, id=gemini_message_id)
+
+
+class GeneratePresignedUrl(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+        file_name = request.query_params.get('file_name')
+        response = s3_client.generate_presigned_post(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=f'memo-bubble/videos/{file_name}',
+            Fields=None,
+            Conditions=None,
+            ExpiresIn=3600
+        )
+        return Response(response)
+
+
+class SaveVideoMetadata(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = VideoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
