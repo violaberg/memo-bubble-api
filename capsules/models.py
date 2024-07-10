@@ -20,7 +20,7 @@ class Capsule(models.Model):
 class Images(models.Model):
     capsule = models.ForeignKey(
         Capsule, related_name='images', on_delete=models.CASCADE)
-    url = models.ImageField(upload_to='memo-bubble/images/')
+    url = models.URLField()
     date_taken = models.DateTimeField(null=True, blank=True)
 
     class Meta:
