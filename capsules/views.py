@@ -5,7 +5,7 @@ from .serializers import CapsuleSerializer, ImageSerializer, VideoSerializer, Ge
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from memo_bubble.permissions import IsAdminUserOrReadOnly, IsOwnerOrReadOnly
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.conf import settings
@@ -31,7 +31,7 @@ class CapsuleList(generics.ListCreateAPIView):
         likes_count=Count('likes', distinct=True),
         capsule_count=Count("owner__capsule")).order_by("-capsule_count")
     serializer_class = CapsuleSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CapsuleFilter
@@ -50,7 +50,7 @@ class CapsuleList(generics.ListCreateAPIView):
 class CapsuleDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Capsule.objects.all()
     serializer_class = CapsuleSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 class ImageList(generics.ListCreateAPIView):
@@ -58,7 +58,7 @@ class ImageList(generics.ListCreateAPIView):
         return Images.objects.filter(capsule=self.kwargs["pk"])
 
     serializer_class = ImageSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class VideoList(generics.ListCreateAPIView):
@@ -66,7 +66,7 @@ class VideoList(generics.ListCreateAPIView):
         return Videos.objects.filter(capsule=self.kwargs["pk"])
 
     serializer_class = VideoSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class GeminiMessageList(generics.ListCreateAPIView):
@@ -81,7 +81,7 @@ class GeminiMessageList(generics.ListCreateAPIView):
             return GeminiMessage.objects.filter(video=self.kwargs["video_id"])
 
     serializer_class = GeminiMessageSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class ImageDelete(generics.RetrieveDestroyAPIView):
@@ -118,7 +118,7 @@ class GeminiMessageDelete(generics.RetrieveDestroyAPIView):
 
 
 class GeneratePresignedUrl(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, *args, **kwargs):
         s3_client = boto3.client(
@@ -135,11 +135,11 @@ class GeneratePresignedUrl(APIView):
             Conditions=None,
             ExpiresIn=3600
         )
-        return Response(response)
+        return Response(response.get('fields').get('key'))
 
 
 class SaveVideoMetadata(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request, *args, **kwargs):
         serializer = VideoSerializer(data=request.data)
