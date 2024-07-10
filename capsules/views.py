@@ -135,7 +135,7 @@ class GeneratePresignedUrl(APIView):
             Conditions=None,
             ExpiresIn=3600
         )
-        return Response(response.get('fields').get('key'))
+        return Response(response)
 
 
 class SaveVideoMetadata(APIView):
