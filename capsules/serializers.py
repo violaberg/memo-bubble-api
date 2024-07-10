@@ -209,7 +209,6 @@ class CapsuleSerializer(serializers.ModelSerializer):
             "videos",
             "uploaded_images",
             "uploaded_images_metadata",
-            "uploaded_videos",
             "uploaded_videos_metadata",
             "like_id",
             "likes_count",
