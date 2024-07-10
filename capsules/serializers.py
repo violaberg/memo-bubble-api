@@ -5,19 +5,19 @@ from django.core.files.images import get_image_dimensions
 from likes.models import Like
 
 
-def validate_images(value):
-    for image in value:
-        if image.size > 1024 * 1024 * 2:
-            raise serializers.ValidationError(
-                "Image size can't exceed 2MB")
-        width, height = get_image_dimensions(image)
-        if width > 4096:
-            raise serializers.ValidationError(
-                "Image width can't exceed 4096px")
-        if height > 4096:
-            raise serializers.ValidationError(
-                "Image height can't exceed 4096px")
-    return value
+# def validate_images(value):
+#     for image in value:
+#         if image.size > 1024 * 1024 * 2:
+#             raise serializers.ValidationError(
+#                 "Image size can't exceed 2MB")
+#         width, height = get_image_dimensions(image)
+#         if width > 4096:
+#             raise serializers.ValidationError(
+#                 "Image width can't exceed 4096px")
+#         if height > 4096:
+#             raise serializers.ValidationError(
+#                 "Image height can't exceed 4096px")
+#     return value
 
 
 class GeminiMessageSerializer(serializers.ModelSerializer):
@@ -65,10 +65,10 @@ class CapsuleSerializer(serializers.ModelSerializer):
     like_id = serializers.SerializerMethodField()
     likes_count = serializers.ReadOnlyField()
 
-    uploaded_images = serializers.ListField(
-        child=serializers.ImageField(), write_only=True,
-        required=False, validators=[validate_images]
-    )
+    # uploaded_images = serializers.ListField(
+    #     child=serializers.ImageField(), write_only=True,
+    #     required=False, validators=[validate_images]
+    # )
     uploaded_images_metadata = serializers.CharField(
         write_only=True, required=False)
     # uploaded_videos = serializers.ListField(
@@ -88,7 +88,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        uploaded_images = validated_data.pop("uploaded_images", [])
+        # uploaded_images = validated_data.pop("uploaded_images", [])
         uploaded_images_metadata = json.loads(
             validated_data.pop("uploaded_images_metadata", "[]"))
         # uploaded_videos = validated_data.pop("uploaded_videos", [])
@@ -98,13 +98,12 @@ class CapsuleSerializer(serializers.ModelSerializer):
         capsule = Capsule.objects.create(**validated_data)
 
         images = []
-        for image_file, image_data in zip(
-                uploaded_images, uploaded_images_metadata
-        ):
+        for image_data in uploaded_images_metadata:
+            url = image_data.get("url")
             date_taken = image_data.get("date_taken")
             gemini_messages_data = image_data.get("gemini_messages", [])
             image = Images.objects.create(
-                capsule=capsule, url=image_file, date_taken=date_taken
+                capsule=capsule, url=url, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
@@ -123,26 +122,12 @@ class CapsuleSerializer(serializers.ModelSerializer):
                 GeminiMessage.objects.create(
                     video=video, **gemini_message_data)
             videos.append(video)
-        # for video_file, video_data in zip(
-        #         uploaded_videos, uploaded_videos_metadata
-        # ):
-        #     date_taken = video_data.get("date_taken")
-        #     gemini_messages_data = video_data.get("gemini_messages", [])
-        #     video = Videos.objects.create(
-        #         capsule=capsule, url=video_file, date_taken=date_taken
-        #     )
-        #     for gemini_message_data in gemini_messages_data:
-        #         GeminiMessage.objects.create(
-        #             video=video, **gemini_message_data)
-        #     videos.append(video)
 
         return capsule
 
     def update(self, instance, validated_data):
-        uploaded_images = validated_data.pop("uploaded_images", [])
         uploaded_images_metadata = json.loads(
             validated_data.pop("uploaded_images_metadata", "[]"))
-        # uploaded_videos = validated_data.pop("uploaded_videos", [])
         uploaded_videos_metadata = json.loads(
             validated_data.pop("uploaded_videos_metadata", "[]"))
 
@@ -153,13 +138,12 @@ class CapsuleSerializer(serializers.ModelSerializer):
         instance.save()
 
         images = []
-        for image_file, image_data in zip(
-                uploaded_images, uploaded_images_metadata
-        ):
+        for image_data in uploaded_images_metadata:
+            url = image_data.get("url")
             date_taken = image_data.get("date_taken")
             gemini_messages_data = image_data.get("gemini_messages", [])
             image = Images.objects.create(
-                capsule=instance, url=image_file, date_taken=date_taken
+                capsule=instance, url=url, date_taken=date_taken
             )
             for gemini_message_data in gemini_messages_data:
                 GeminiMessage.objects.create(
@@ -178,18 +162,6 @@ class CapsuleSerializer(serializers.ModelSerializer):
                 GeminiMessage.objects.create(
                     video=video, **gemini_message_data)
             videos.append(video)
-        # for video_file, video_data in zip(
-        #         uploaded_videos, uploaded_videos_metadata
-        # ):
-        #     date_taken = video_data.get("date_taken")
-        #     gemini_messages_data = video_data.get("gemini_messages", [])
-        #     video = Videos.objects.create(
-        #         capsule=instance, url=video_file, date_taken=date_taken
-        #     )
-        #     for gemini_message_data in gemini_messages_data:
-        #         GeminiMessage.objects.create(
-        #             video=video, **gemini_message_data)
-        #     videos.append(video)
 
         return instance
 
@@ -207,7 +179,6 @@ class CapsuleSerializer(serializers.ModelSerializer):
             "profile_id",
             "images",
             "videos",
-            "uploaded_images",
             "uploaded_images_metadata",
             "uploaded_videos_metadata",
             "like_id",
