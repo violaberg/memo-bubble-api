@@ -24,4 +24,5 @@ urlpatterns = [
          name='generate_presigned_url'),
     path('save_video_metadata/', views.SaveVideoMetadata.as_view(),
          name='save_video_metadata'),
+     path('complete_multipart_upload/', views.CompleteMultipartUpload.as_view(), name='complete-multipart-upload'),
 ]
