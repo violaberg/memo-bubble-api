@@ -20,9 +20,12 @@ urlpatterns = [
     path('capsules/<int:pk>/images/<int:image_id>'
          '/gemini-messages/<int:gemini_message_id>/',
          views.GeminiMessageDelete.as_view(), name='gemini-message-delete'),
+    path('initiate_multipart_upload/', views.InitiateMultipartUpload.as_view(),
+         name='initiate_multiple_upload'),
     path('generate_presigned_url/', views.GeneratePresignedUrl.as_view(),
          name='generate_presigned_url'),
     path('save_video_metadata/', views.SaveVideoMetadata.as_view(),
          name='save_video_metadata'),
-     path('complete_multipart_upload/', views.CompleteMultipartUpload.as_view(), name='complete-multipart-upload'),
+    path('complete_multipart_upload/', views.CompleteMultipartUpload.as_view(),
+         name='complete-multipart-upload'),
 ]
