@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from django.conf import settings
 import boto3
 import json
+from botocore.exceptions import NoCredentialsError, ClientError
+from django.http import JsonResponse
 
 
 class CapsuleFilter(filter.FilterSet):
@@ -117,62 +119,89 @@ class GeminiMessageDelete(generics.RetrieveDestroyAPIView):
         return generics.get_object_or_404(GeminiMessage, id=gemini_message_id)
 
 
+class InitiateMultipartUpload(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request):
+        file_name = request.data.get("file_name")
+        if not file_name or not isinstance(file_name, str):
+            return Response({"error": "Missing or invalid file name"}, status=status.HTTP_400_BAD_REQUEST)
+
+        s3_client = boto3.client('s3',
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                 region_name=settings.AWS_S3_REGION_NAME)
+
+        try:
+            response = s3_client.create_multipart_upload(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=file_name
+            )
+            return JsonResponse({'uploadId': response['UploadId']})
+        except NoCredentialsError:
+            return JsonResponse({'error': 'Credentials not available'}, status=403)
+        except ClientError as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+
 class GeneratePresignedUrl(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request, *args, **kwargs):
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            region_name=settings.AWS_S3_REGION_NAME,
-            config=boto3.session.Config(s3={'use_accelerate_endpoint': True})
-        )
-        file_name = request.query_params.get('file_name')
-        part_number = request.query_params.get('part_number')
-        upload_id = request.query_params.get('upload_id')
+    def get(self, request):
+        file_name = request.query_params.get("file_name")
+        part_number = request.query_params.get("part_number")
+        upload_id = request.query_params.get("upload_id")
 
+        if not file_name or not isinstance(file_name, str):
+            return Response({"error": "Missing or invalid file name"}, status=status.HTTP_400_BAD_REQUEST)
+        if not part_number:
+            return Response({"error": "Missing part number"}, status=status.HTTP_400_BAD_REQUEST)
         if not upload_id:
-            response = s3_client.create_multipart_upload(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=file_name)
-            upload_id = response['UploadId']
+            return Response({"error": "Missing upload ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        presigned_url = s3_client.generate_presigned_url(
-            'upload_part',
-            Params={
-                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-                'Key': file_name,
-                'UploadId': upload_id,
-                'PartNumber': int(part_number)
-            },
-            ExpiresIn=3600
-        )
+        try:
+            part_number = int(part_number)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid part number"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'url': presigned_url, 'uploadId': upload_id})
-        #response = s3_client.generate_presigned_post(
-        #    Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-        #    Key=f'memo-bubble/videos/{file_name}',
-        #    Fields=None,
-        #    Conditions=None,
-        #    ExpiresIn=3600
-        #)
-        #return Response(response)
+        s3_client = boto3.client('s3',
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                 region_name=settings.AWS_S3_REGION_NAME)
+
+        try:
+            presigned_url = s3_client.generate_presigned_url(
+                ClientMethod='upload_part',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': file_name,
+                    'UploadId': upload_id,
+                    'PartNumber': part_number
+                },
+                ExpiresIn=3600
+            )
+            return Response({"url": presigned_url}, status=status.HTTP_200_OK)
+        except NoCredentialsError:
+            return Response({"error": "Credentials not available"}, status=status.HTTP_400_BAD_REQUEST)
+        except ClientError as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CompleteMultipartUpload(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request, *args, **kwargs):
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            region_name=settings.AWS_S3_REGION_NAME,
-            config=boto3.session.Config(s3={'use_accelerate_endpoint': True})
-        )
-        data = request.data
-        upload_id = data['uploadId']
-        parts = data['parts']
-        file_name = data['fileName']
+        s3_client = boto3.client('s3',
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                 region_name=settings.AWS_S3_REGION_NAME)
+
+        upload_id = request.data.get('uploadId')
+        parts = request.data.get('parts')
+        file_name = request.data.get('fileName')
+
+        if not upload_id or not parts or not file_name:
+            return JsonResponse({'error': 'Missing parameters'}, status=400)
 
         try:
             result = s3_client.complete_multipart_upload(
@@ -181,10 +210,11 @@ class CompleteMultipartUpload(APIView):
                 UploadId=upload_id,
                 MultipartUpload={'Parts': parts}
             )
-        except (boto3.exceptions.S3UploadFailedError, boto3.exceptions.Boto3Error) as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(result)
+            return JsonResponse(result)
+        except NoCredentialsError:
+            return JsonResponse({'error': 'Credentials not available'}, status=403)
+        except ClientError as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 
 class SaveVideoMetadata(APIView):
