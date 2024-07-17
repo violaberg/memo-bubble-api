@@ -13,6 +13,11 @@ import boto3
 import json
 from botocore.exceptions import NoCredentialsError, ClientError
 from django.http import JsonResponse
+from botocore.config import Config
+
+
+# Configuration for S3 client
+s3_config = Config(signature_version='s3v4')
 
 
 class CapsuleFilter(filter.FilterSet):
@@ -130,7 +135,8 @@ class InitiateMultipartUpload(APIView):
         s3_client = boto3.client('s3',
                                  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                                  aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                 region_name=settings.AWS_S3_REGION_NAME)
+                                 region_name=settings.AWS_S3_REGION_NAME,
+                                 config=s3_config)
 
         try:
             response = s3_client.create_multipart_upload(
@@ -167,7 +173,8 @@ class GeneratePresignedUrl(APIView):
         s3_client = boto3.client('s3',
                                  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                                  aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                 region_name=settings.AWS_S3_REGION_NAME)
+                                 region_name=settings.AWS_S3_REGION_NAME,
+                                 config=s3_config)
 
         try:
             presigned_url = s3_client.generate_presigned_url(
@@ -194,7 +201,8 @@ class CompleteMultipartUpload(APIView):
         s3_client = boto3.client('s3',
                                  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                                  aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                 region_name=settings.AWS_S3_REGION_NAME)
+                                 region_name=settings.AWS_S3_REGION_NAME,
+                                 config=s3_config)
 
         upload_id = request.data.get('uploadId')
         parts = request.data.get('parts')
