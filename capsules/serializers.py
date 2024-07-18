@@ -133,6 +133,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
 
         instance.title = validated_data.get("title", instance.title)
         instance.message = validated_data.get("message", instance.message)
+        instance.location = validated_data.get("location", instance.location)
         instance.release_date = validated_data.get(
             "release_date", instance.release_date)
         instance.save()
@@ -172,6 +173,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
             "owner",
             "title",
             "message",
+            "location",
             "release_date",
             "created_on",
             "updated_on",
