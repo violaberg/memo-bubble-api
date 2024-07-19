@@ -6,7 +6,8 @@ class Capsule(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     message = models.TextField()
-    location = models.CharField(max_length=255, blank=False, null=False, default='Unknown')
+    location = models.CharField(
+        max_length=255, blank=False, null=False, default='Unknown')
     release_date = models.DateTimeField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
