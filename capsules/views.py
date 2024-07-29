@@ -34,6 +34,7 @@ class CapsuleFilter(filter.FilterSet):
         fields = {
             'owner': ['exact'],
             'release_date': ['exact'],
+            'location': ['exact'],
         }
 
 
@@ -52,6 +53,7 @@ class CapsuleList(generics.ListCreateAPIView):
         'likes__owner',
         'owner',
         'release_date',
+        'location',
     ]
 
     def perform_create(self, serializer):
