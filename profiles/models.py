@@ -18,7 +18,7 @@ class Profile(models.Model):
     phone = PhoneNumberField(blank=True)
     image = models.ImageField(
         upload_to="memo-bubble/profile_images",
-        default="memo-bubble/profile_images/default_profile_qdfffx", blank=True
+        default="https://memo-bubble-app.s3.eu-west-1.amazonaws.com/media/memo-bubble/placeholder/placeholder.png", blank=True
     )
 
     class Meta:
