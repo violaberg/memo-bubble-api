@@ -270,6 +270,14 @@ class SaveVideoMetadata(APIView):
 
 
 class GetPlaceAutocomplete(APIView):
+    """
+    A view that handles requests to get place autocomplete suggestions from the Google Places API.
+
+    Methods
+    -------
+    get(request, *args, **kwargs):
+        Handles GET requests to fetch place autocomplete suggestions based on the input text.
+    """
     def get(self, request, *args, **kwargs):
         input_text = request.query_params.get('input', '')
         api_key = settings.GOOGLE_MAPS_API_KEY
