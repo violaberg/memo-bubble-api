@@ -28,4 +28,6 @@ urlpatterns = [
          name='save_video_metadata'),
     path('complete_multipart_upload/', views.CompleteMultipartUpload.as_view(),
          name='complete-multipart-upload'),
+     path('api/maps/place/', views.GetPlaceAutocomplete.as_view(),
+          name='place-autocomplete'),
 ]

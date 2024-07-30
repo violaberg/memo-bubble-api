@@ -13,6 +13,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError, ClientError
 from django.http import JsonResponse
 from botocore.config import Config
+import requests
 
 
 AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
@@ -266,3 +267,17 @@ class SaveVideoMetadata(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetPlaceAutocomplete(APIView):
+    def get(self, request, *args, **kwargs):
+        input_text = request.query_params.get('input', '')
+        api_key = settings.GOOGLE_MAPS_API_KEY
+
+        if not input_text:
+            return Response({"error": "Missing input parameter"}, status=400)
+
+        url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
+        params = {'input': input_text, 'key': api_key}
+        response = requests.get(url, params=params)
+        return Response(response.json())

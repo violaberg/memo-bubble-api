@@ -162,6 +162,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'memo_bubble.wsgi.application'
 
+# Google Maps API
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
