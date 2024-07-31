@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     "contact",
     "capsules",
     "likes",
+    "comments",
     "storages",
 ]
 

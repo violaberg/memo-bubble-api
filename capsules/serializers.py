@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Capsule, Images, Videos, GeminiMessage
 from django.core.files.images import get_image_dimensions
 from likes.models import Like
+from comments.serializers import CommentSerializer
 
 
 # def validate_images(value):
@@ -64,6 +65,7 @@ class CapsuleSerializer(serializers.ModelSerializer):
     videos = VideoSerializer(many=True, required=False)
     like_id = serializers.SerializerMethodField()
     likes_count = serializers.ReadOnlyField()
+    comments = CommentSerializer(many=True, read_only=True)
 
     # uploaded_images = serializers.ListField(
     #     child=serializers.ImageField(), write_only=True,
@@ -185,4 +187,5 @@ class CapsuleSerializer(serializers.ModelSerializer):
             "uploaded_videos_metadata",
             "like_id",
             "likes_count",
+            "comments",
         ]

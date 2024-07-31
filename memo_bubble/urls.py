@@ -35,4 +35,5 @@ urlpatterns = [
     path("", include("contact.urls")),
     path("", include("capsules.urls")),
     path("", include("likes.urls")),
+    path('api/', include('comments.urls')),
 ]
