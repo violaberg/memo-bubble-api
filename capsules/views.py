@@ -289,3 +289,5 @@ class GetPlaceAutocomplete(APIView):
         params = {'input': input_text, 'key': api_key}
         response = requests.get(url, params=params)
         return Response(response.json())
+
+
