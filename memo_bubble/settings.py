@@ -74,6 +74,9 @@ ALLOWED_HOSTS = [
     os.environ.get("ALLOWED_HOST_GP"),
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    os.environ.get("CSRF_TRUSTED_ORIGIN"),
+]
 
 # Application definition
 
