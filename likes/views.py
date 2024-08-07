@@ -2,6 +2,8 @@ from rest_framework import generics, permissions
 from memo_bubble.permissions import IsOwnerOrReadOnly
 from .models import Like
 from .serializers import LikeSerializer
+from notifications.signals import notify
+from capsules.models import Capsule
 
 
 class LikeList(generics.ListCreateAPIView):
@@ -16,7 +18,14 @@ class LikeList(generics.ListCreateAPIView):
     ]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        like = serializer.save(owner=self.request.user)
+        capsule = like.capsule
+        notify.send(
+            self.request.user,
+            recipient=Capsule.owner,
+            verb='liked your capsule',
+            target=capsule
+        )
 
 
 class LikeDetail(generics.RetrieveDestroyAPIView):

@@ -75,7 +75,9 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    os.environ.get("CSRF_TRUSTED_ORIGIN"),
+    "http://localhost:3000",
+    "https://memobubble.site",
+    "https://*.herokuapp.com",
 ]
 
 # Application definition
@@ -105,7 +107,9 @@ INSTALLED_APPS = [
     "capsules",
     "likes",
     "comments",
+    "usernotifications",
     "storages",
+    "notifications",
 ]
 
 SITE_ID = 1
