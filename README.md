@@ -69,8 +69,6 @@ User register/login | 5 | 5
 User profile | 5 | 5
 User comments | 3 | 4
 User likes | 3 | 4
-Full CRUD funcionality for user | 5 | 5
-Full CRUD funcionality for admin | 5 | 5
 Admin login | 5 | 5
 Capsule searching | 5 | 5
 Password recovery | 5 | 5
