@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import root_route, logout_route, get_user_status, CustomConfirmEmailView, resend_email_confirmation, CommentViewSet
+from .views import root_route, logout_route, get_user_status, CustomConfirmEmailView, resend_email_confirmation
 
 urlpatterns = [
     path("", root_route),
@@ -36,5 +36,5 @@ urlpatterns = [
     path("", include("capsules.urls")),
     path("", include("likes.urls")),
     path("", include("comments.urls")),
-    path('comments/', CommentViewSet.as_view({'post': 'create'}), name='comment-create'),
+    path("", include("usernotifications.urls")),
 ]
